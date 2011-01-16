@@ -1,6 +1,5 @@
-#sidebar Table Of Contents
-* [Articles Introduction introduction]
-* [Articles Tutorials]
+  * [Articles Introduction introduction]
+  * [Articles Tutorials]
     * [Articles Getting Started gettingstarted]
-* [Articles Videos]
+  * [Articles Videos]
     * [Articles Demo demo]
