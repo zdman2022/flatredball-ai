@@ -1,4 +1,3 @@
-#summary Introduction
 #sidebar TableOfContents
 
    When I started developing this library, I wasn't just making it for myself, but for all of the FlatRedBall developers.  I wanted to give an easy to use, very flexible library that can give the developers the tools they need to create a great game.
