@@ -3,4 +3,4 @@
 * [Articles Tutorials]
     * [Articles Getting Started gettingstarted]
 * [Articles Videos]
-    * [Articles Demo]
+    * [Articles Demo demo]
