@@ -1,4 +1,5 @@
 #summary Video of AI in action.
+#sidebar TableOfContents
 
 = Introduction =
 
