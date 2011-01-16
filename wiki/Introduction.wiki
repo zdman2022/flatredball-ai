@@ -1,4 +1,5 @@
 #summary Introduction
+#sidebar TableOfContents
 
 = Introduction =
 
