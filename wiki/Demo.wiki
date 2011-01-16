@@ -7,6 +7,6 @@
 This is a short video showing 2 chasers chasing several runners on a map with obstables.
 
 
-= Details =
+= Video =
 
-Video:
+<wiki:video url="http://www.youtube.com/watch?v=MEmxYC4Xueo"/>
