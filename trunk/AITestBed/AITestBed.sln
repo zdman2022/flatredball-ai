@@ -1,7 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C# Express 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AITestBed", "AITestBed\AITestBed.csproj", "{23A639E7-D2F4-43AE-B744-D0965F3E6E44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AITestBedContent", "AITestBed\Content\AITestBedContent.contentproj", "{9D067734-2601-4451-94C2-CB3AC0AB499D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

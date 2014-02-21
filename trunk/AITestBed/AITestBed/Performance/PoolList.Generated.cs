@@ -31,7 +31,16 @@ namespace AITestBed.Performance
         public void Clear()
         {
             mPoolables.Clear();
-            mNextAvailable = -1;
+            // This should be 0.
+            //mNextAvailable = -1;
+            // The reason is that if
+            // we set it to -1, then make
+            // an Entity unused, then the MakeUnused
+            // method may set the value to a value that
+            // is not valid.  We don't need to use -1 as
+            // a value to indicate this is uninitialized, the
+            // factories themselves will do this
+            mNextAvailable = 0;
         }
 
         public T GetNextAvailable()

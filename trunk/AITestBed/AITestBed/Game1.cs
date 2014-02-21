@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FlatRedBall.Screens;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -8,8 +9,6 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Net;
-using Microsoft.Xna.Framework.Storage;
 using FlatRedBall;
 
 namespace AITestBed
@@ -37,13 +36,14 @@ namespace AITestBed
         protected override void Initialize()
         {
             FlatRedBallServices.InitializeFlatRedBall(this, graphics);
+			CameraSetup.SetupCamera(SpriteManager.Camera, graphics);
 			GlobalContent.Initialize();
 
             // Uncomment the following line and add your Screen's fully qualified name
             // if using Screens in your project.  If not, or if you don't know what it means,
             // just ignore the following line for now.
             // For more information on Screens see the Screens wiki article on FlatRedBall.com.
-			Screens.ScreenManager.Start(typeof(AITestBed.Screens.MainScreen).FullName);
+			FlatRedBall.Screens.ScreenManager.Start(typeof(AITestBed.Screens.MainScreen));
 
 
 
@@ -59,7 +59,7 @@ namespace AITestBed
         protected override void Update(GameTime gameTime)
         {
             FlatRedBallServices.Update(gameTime);
-            Screens.ScreenManager.Activity();
+            ScreenManager.Activity();
 
             // TODO: Add your update logic here
 

@@ -1,32 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
-using FlatRedBall.ManagedSpriteGroups;
-using FlatRedBall.Math;
-using FlatRedBall.Math.Geometry;
-using FlatRedBall.AI.Pathfinding;
-using FlatRedBall.Graphics;
-using FlatRedBall.Graphics.Animation;
-using FlatRedBall.Graphics.Particle;
-#if !SILVERLIGHT
-using FlatRedBall.Graphics.Model;
-#endif
-using FlatRedBall.Input;
 
-using FlatRedBall.Instructions;
-using FlatRedBall.Math.Splines;
 using BitmapFont = FlatRedBall.Graphics.BitmapFont;
 using Cursor = FlatRedBall.Gui.Cursor;
 using GuiManager = FlatRedBall.Gui.GuiManager;
 // Generated Usings
 using AITestBed.Screens;
-using Matrix = Microsoft.Xna.Framework.Matrix;
-using FlatRedBall.Broadcasting;
+using FlatRedBall.Graphics;
+using FlatRedBall.Math;
 using AITestBed.Entities;
+using FlatRedBall;
+using FlatRedBall.Screens;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using FlatRedBall.Math.Geometry;
 
+#if XNA4 || WINDOWS_8
+using Color = Microsoft.Xna.Framework.Color;
+#elif FRB_MDX
+using Color = System.Drawing.Color;
+#else
+using Color = Microsoft.Xna.Framework.Graphics.Color;
+#endif
 
 #if FRB_XNA || SILVERLIGHT
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -34,13 +28,13 @@ using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
 #endif
 
-#if FRB_XNA
+#if FRB_XNA && !MONODROID
 using Model = Microsoft.Xna.Framework.Graphics.Model;
 #endif
 
 namespace AITestBed.Entities
 {
-	public partial class Character : PositionedObject
+	public partial class Character : PositionedObject, IDestroyable
 	{
         // This is made global so that static lazy-loaded content can access it.
         public static string ContentManagerName
@@ -50,18 +44,46 @@ namespace AITestBed.Entities
         }
 
 		// Generated Fields
-		private static ShapeCollection EntityCollisionFile;
-		public int MaxSpeed = 0;
-		static bool mHasRegisteredUnload = false;
+		#if DEBUG
+		static bool HasBeenLoadedWithGlobalContentManager = false;
+		#endif
 		static object mLockObject = new object();
-
-		private Circle mCollision;
-		public Circle Collision
+		static List<string> mRegisteredUnloads = new List<string>();
+		static List<string> LoadedContentManagers = new List<string>();
+		protected static FlatRedBall.Math.Geometry.ShapeCollection EntityCollisionFile;
+		
+		private FlatRedBall.Math.Geometry.Circle mCollision;
+		public FlatRedBall.Math.Geometry.Circle Collision
 		{
-			get{ return mCollision;}
+			get
+			{
+				return mCollision;
+			}
+			private set
+			{
+				mCollision = value;
+			}
 		}
+		int mMaxSpeed = 0;
+		public virtual int MaxSpeed
+		{
+			set
+			{
+				mMaxSpeed = value;
+			}
+			get
+			{
+				return mMaxSpeed;
+			}
+		}
+		protected Layer LayerProvidedByContainer = null;
 
-        Layer LayerProvidedByContainer = null;
+        public Character()
+            : this(FlatRedBall.Screens.ScreenManager.CurrentScreen.ContentManagerName, true)
+        {
+
+        }
+
         public Character(string contentManagerName) :
             this(contentManagerName, true)
         {
@@ -73,20 +95,18 @@ namespace AITestBed.Entities
 		{
 			// Don't delete this:
             ContentManagerName = contentManagerName;
-            Initialize(addToManagers);
+            InitializeEntity(addToManagers);
 
 		}
 
-		protected virtual void Initialize(bool addToManagers)
+		protected virtual void InitializeEntity(bool addToManagers)
 		{
 			// Generated Initialize
 			LoadStaticContent(ContentManagerName);
-
-
 			mCollision = EntityCollisionFile.Circles.FindByName("Circle1").Clone();
-			SetCustomVariables();
+			
 			PostInitialize();
-			if(addToManagers)
+			if (addToManagers)
 			{
 				AddToManagers(null);
 			}
@@ -95,60 +115,31 @@ namespace AITestBed.Entities
 		}
 
 // Generated AddToManagers
-
-        public virtual void AddToManagers(Layer layerToAddTo)
-        {
+		public virtual void AddToManagers (Layer layerToAddTo)
+		{
 			LayerProvidedByContainer = layerToAddTo;
 			SpriteManager.AddPositionedObject(this);
-
-
-            // We move this back to the origin and unrotate it so that anything attached to it can just use its absolute position
-            float oldRotationX = RotationX;
-            float oldRotationY = RotationY;
-            float oldRotationZ = RotationZ;
-
-            float oldX = X;
-            float oldY = Y;
-            float oldZ = Z;
-
-            X = 0;
-            Y = 0;
-            Z = 0;
-            RotationX = 0;
-            RotationY = 0;
-            RotationZ = 0;
-
-			ShapeManager.AddToLayer(mCollision, layerToAddTo);
-			mCollision.AttachTo(this, true);
-
-            X = oldX;
-            Y = oldY;
-            Z = oldZ;
-            RotationX = oldRotationX;
-            RotationY = oldRotationY;
-            RotationZ = oldRotationZ;
-                			CustomInitialize();
-
-        }
+			AddToManagersBottomUp(layerToAddTo);
+			CustomInitialize();
+		}
 
 		public virtual void Activity()
 		{
 			// Generated Activity
-
-
-
+			
 			CustomActivity();
+			
+			// After Custom Activity
 		}
 
 		public virtual void Destroy()
 		{
 			// Generated Destroy
 			SpriteManager.RemovePositionedObject(this);
-
-
-			if(Collision != null)
+			
+			if (Collision != null)
 			{
-				ShapeManager.Remove(Collision);
+				Collision.Detach(); ShapeManager.Remove(Collision);
 			}
 
 
@@ -156,56 +147,158 @@ namespace AITestBed.Entities
 		}
 
 		// Generated Methods
-		public virtual void PostInitialize()
+		public virtual void PostInitialize ()
 		{
+			bool oldShapeManagerSuppressAdd = FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue;
+			FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue = true;
+			if (mCollision.Parent == null)
+			{
+				mCollision.CopyAbsoluteToRelative();
+				mCollision.AttachTo(this, false);
+			}
+			FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue = oldShapeManagerSuppressAdd;
 		}
-		public virtual void ConvertToManuallyUpdated()
+		public virtual void AddToManagersBottomUp (Layer layerToAddTo)
 		{
+			// We move this back to the origin and unrotate it so that anything attached to it can just use its absolute position
+			float oldRotationX = RotationX;
+			float oldRotationY = RotationY;
+			float oldRotationZ = RotationZ;
+			
+			float oldX = X;
+			float oldY = Y;
+			float oldZ = Z;
+			
+			X = 0;
+			Y = 0;
+			Z = 0;
+			RotationX = 0;
+			RotationY = 0;
+			RotationZ = 0;
+			ShapeManager.AddToLayer(mCollision, layerToAddTo);
+			X = oldX;
+			Y = oldY;
+			Z = oldZ;
+			RotationX = oldRotationX;
+			RotationY = oldRotationY;
+			RotationZ = oldRotationZ;
+		}
+		public virtual void ConvertToManuallyUpdated ()
+		{
+			this.ForceUpdateDependenciesDeep();
 			SpriteManager.ConvertToManuallyUpdated(this);
 		}
-		protected virtual void SetCustomVariables()
+		public static void LoadStaticContent (string contentManagerName)
 		{
-		}
-
-		public static void LoadStaticContent(string contentManagerName)
-		{
+			if (string.IsNullOrEmpty(contentManagerName))
+			{
+				throw new ArgumentException("contentManagerName cannot be empty or null");
+			}
 			ContentManagerName = contentManagerName;
+			#if DEBUG
+			if (contentManagerName == FlatRedBallServices.GlobalContentManager)
+			{
+				HasBeenLoadedWithGlobalContentManager = true;
+			}
+			else if (HasBeenLoadedWithGlobalContentManager)
+			{
+				throw new Exception("This type has been loaded with a Global content manager, then loaded with a non-global.  This can lead to a lot of bugs");
+			}
+			#endif
 			bool registerUnload = false;
-			if(!FlatRedBallServices.IsLoaded(@"content/entities/character/entitycollisionfile.shcx", ContentManagerName))
+			if (LoadedContentManagers.Contains(contentManagerName) == false)
 			{
-				registerUnload = true;
-				EntityCollisionFile = FlatRedBallServices.Load<ShapeCollection>(@"content/entities/character/entitycollisionfile.shcx", ContentManagerName);
-				FlatRedBallServices.AddNonDisposable(@"content/entities/character/entitycollisionfile.shcx", EntityCollisionFile, ContentManagerName);
-			}
-			else
-			{
-				EntityCollisionFile = (ShapeCollection)FlatRedBallServices.GetNonDisposable(@"content/entities/character/entitycollisionfile.shcx", ContentManagerName);
-			}
-			const bool throwExceptionIfAfterInitialize = false;
-			if(throwExceptionIfAfterInitialize && registerUnload && ScreenManager.CurrentScreen != null && ScreenManager.CurrentScreen.ActivityCallCount > 0 && !ScreenManager.CurrentScreen.IsActivityFinished)
-			{
-				throw new InvalidOperationException("Content is being loaded after the current Screen is initialized.  This exception is being thrown because of a setting in Glue.");
-			}
-			if(registerUnload)
-			{
-				lock(mLockObject)
+				LoadedContentManagers.Add(contentManagerName);
+				lock (mLockObject)
 				{
-					if(!mHasRegisteredUnload)
+					if (!mRegisteredUnloads.Contains(ContentManagerName) && ContentManagerName != FlatRedBallServices.GlobalContentManager)
 					{
 						FlatRedBallServices.GetContentManagerByName(ContentManagerName).AddUnloadMethod("CharacterStaticUnload", UnloadStaticContent);
-						mHasRegisteredUnload = true;
+						mRegisteredUnloads.Add(ContentManagerName);
+					}
+				}
+				if (!FlatRedBallServices.IsLoaded<FlatRedBall.Math.Geometry.ShapeCollection>(@"content/entities/character/entitycollisionfile.shcx", ContentManagerName))
+				{
+					registerUnload = true;
+				}
+				EntityCollisionFile = FlatRedBallServices.Load<FlatRedBall.Math.Geometry.ShapeCollection>(@"content/entities/character/entitycollisionfile.shcx", ContentManagerName);
+			}
+			if (registerUnload && ContentManagerName != FlatRedBallServices.GlobalContentManager)
+			{
+				lock (mLockObject)
+				{
+					if (!mRegisteredUnloads.Contains(ContentManagerName) && ContentManagerName != FlatRedBallServices.GlobalContentManager)
+					{
+						FlatRedBallServices.GetContentManagerByName(ContentManagerName).AddUnloadMethod("CharacterStaticUnload", UnloadStaticContent);
+						mRegisteredUnloads.Add(ContentManagerName);
 					}
 				}
 			}
 			CustomLoadStaticContent(contentManagerName);
 		}
-		public static void UnloadStaticContent()
+		public static void UnloadStaticContent ()
 		{
-			mHasRegisteredUnload = false;
-			if(EntityCollisionFile != null)
+			if (LoadedContentManagers.Count != 0)
 			{
+				LoadedContentManagers.RemoveAt(0);
+				mRegisteredUnloads.RemoveAt(0);
 			}
+			if (LoadedContentManagers.Count == 0)
+			{
+				if (EntityCollisionFile != null)
+				{
+					EntityCollisionFile.RemoveFromManagers(ContentManagerName != "Global");
+					EntityCollisionFile= null;
+				}
+			}
+		}
+		[System.Obsolete("Use GetFile instead")]
+		public static object GetStaticMember (string memberName)
+		{
+			switch(memberName)
+			{
+				case  "EntityCollisionFile":
+					return EntityCollisionFile;
+			}
+			return null;
+		}
+		public static object GetFile (string memberName)
+		{
+			switch(memberName)
+			{
+				case  "EntityCollisionFile":
+					return EntityCollisionFile;
+			}
+			return null;
+		}
+		object GetMember (string memberName)
+		{
+			switch(memberName)
+			{
+				case  "EntityCollisionFile":
+					return EntityCollisionFile;
+			}
+			return null;
+		}
+		protected bool mIsPaused;
+		public override void Pause (FlatRedBall.Instructions.InstructionList instructions)
+		{
+			base.Pause(instructions);
+			mIsPaused = true;
+		}
+		public virtual void SetToIgnorePausing ()
+		{
+			FlatRedBall.Instructions.InstructionManager.IgnorePausingFor(this);
+			FlatRedBall.Instructions.InstructionManager.IgnorePausingFor(Collision);
+		}
+		public virtual void MoveToLayer (Layer layerToMoveTo)
+		{
+			LayerProvidedByContainer = layerToMoveTo;
 		}
 
     }
+	
+	
+	// Extra classes
+	
 }

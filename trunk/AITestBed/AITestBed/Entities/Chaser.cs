@@ -42,7 +42,7 @@ namespace AITestBed.Entities
             mSM = new StateMachine<Chaser>(this);
 
             mSM.SetCurrentState(new States.IdleState());
-            Collision.Color = Microsoft.Xna.Framework.Graphics.Color.Red;
+            Collision.Color = Microsoft.Xna.Framework.Color.Red;
         }
 
         private void CustomActivity()

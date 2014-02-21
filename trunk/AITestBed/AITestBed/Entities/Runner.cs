@@ -43,7 +43,7 @@ namespace AITestBed.Entities
 
             mSM.SetCurrentState(new States.IdleState());
 
-            Collision.Color = Microsoft.Xna.Framework.Graphics.Color.Green;
+            Collision.Color = Microsoft.Xna.Framework.Color.Green;
         }
 
         private void CustomActivity()
