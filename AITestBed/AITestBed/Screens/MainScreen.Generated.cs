@@ -1,22 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FlatRedBall;
-using FlatRedBall.Graphics;
-using FlatRedBall.ManagedSpriteGroups;
-using FlatRedBall.Math;
-using FlatRedBall.Math.Geometry;
-using FlatRedBall.AI.Pathfinding;
-using FlatRedBall.Graphics.Animation;
-using FlatRedBall.Input;
-using FlatRedBall.Graphics.Particle;
-using FlatRedBall.Instructions;
-using FlatRedBall.Math.Splines;
 using BitmapFont = FlatRedBall.Graphics.BitmapFont;
 
 using Cursor = FlatRedBall.Gui.Cursor;
 using GuiManager = FlatRedBall.Gui.GuiManager;
+
+#if XNA4 || WINDOWS_8
+using Color = Microsoft.Xna.Framework.Color;
+#elif FRB_MDX
+using Color = System.Drawing.Color;
+#else
+using Color = Microsoft.Xna.Framework.Graphics.Color;
+#endif
 
 #if FRB_XNA || SILVERLIGHT
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -26,166 +19,204 @@ using Microsoft.Xna.Framework.Media;
 #endif
 
 // Generated Usings
-using FlatRedBall.Broadcasting;
 using AITestBed.Entities;
 using FlatRedBall;
+using FlatRedBall.Screens;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using FlatRedBall.Math;
 using FlatRedBall.Math.Geometry;
 
 namespace AITestBed.Screens
 {
 	public partial class MainScreen : Screen
 	{
-        protected bool IsPaused = false;
-
-        protected static double mAccumulatedPausedTime = 0;
-
-        public static double PauseAdjustedCurrentTime
-        {
-            get { return TimeManager.CurrentTime - mAccumulatedPausedTime; }
-        }
-
 		// Generated Fields
-		private Scene StarBackground;
-		private Scene GameWorld;
-		private ShapeCollection WorldCollision;
-
-		private PositionedObjectList<Character> Characters;
+		#if DEBUG
+		static bool HasBeenLoadedWithGlobalContentManager = false;
+		#endif
+		protected FlatRedBall.Scene StarBackground;
+		protected FlatRedBall.Scene GameWorld;
+		protected FlatRedBall.Math.Geometry.ShapeCollection WorldCollision;
+		
+		private PositionedObjectList<AITestBed.Entities.Character> Characters;
 
 		public MainScreen()
 			: base("MainScreen")
 		{
-            mAccumulatedPausedTime = 0;
 		}
 
         public override void Initialize(bool addToManagers)
         {
 			// Generated Initialize
-			StarBackground = FlatRedBallServices.Load<Scene>("content/screens/mainscreen/starbackground.scnx", ContentManagerName);
-			GameWorld = FlatRedBallServices.Load<Scene>("content/screens/mainscreen/gameworld.scnx", ContentManagerName);
-			WorldCollision = FlatRedBallServices.Load<ShapeCollection>("content/screens/mainscreen/worldcollision.shcx", ContentManagerName);
 			LoadStaticContent(ContentManagerName);
-
-
-
-			Characters = new PositionedObjectList<Character>();
-			SetCustomVariables();
+			if (!FlatRedBallServices.IsLoaded<FlatRedBall.Scene>(@"content/screens/mainscreen/starbackground.scnx", ContentManagerName))
+			{
+			}
+			StarBackground = FlatRedBallServices.Load<FlatRedBall.Scene>(@"content/screens/mainscreen/starbackground.scnx", ContentManagerName);
+			if (!FlatRedBallServices.IsLoaded<FlatRedBall.Scene>(@"content/screens/mainscreen/gameworld.scnx", ContentManagerName))
+			{
+			}
+			GameWorld = FlatRedBallServices.Load<FlatRedBall.Scene>(@"content/screens/mainscreen/gameworld.scnx", ContentManagerName);
+			if (!FlatRedBallServices.IsLoaded<FlatRedBall.Math.Geometry.ShapeCollection>(@"content/screens/mainscreen/worldcollision.shcx", ContentManagerName))
+			{
+			}
+			WorldCollision = FlatRedBallServices.Load<FlatRedBall.Math.Geometry.ShapeCollection>(@"content/screens/mainscreen/worldcollision.shcx", ContentManagerName);
+			Characters = new PositionedObjectList<AITestBed.Entities.Character>();
+			
+			
 			PostInitialize();
-			if(addToManagers)
+			base.Initialize(addToManagers);
+			if (addToManagers)
 			{
 				AddToManagers();
 			}
 
         }
-
+        
 // Generated AddToManagers
-
-        public override void AddToManagers()
-        {
-			StarBackground.AddToManagers();
-
-			GameWorld.AddToManagers();
-
-			WorldCollision.AddToManagers();
-
+		public override void AddToManagers ()
+		{
+			base.AddToManagers();
+			AddToManagersBottomUp();
 			CustomInitialize();
-
-        }
+		}
 
 
 		public override void Activity(bool firstTimeCalled)
 		{
 			// Generated Activity
-			if(!IsPaused)
+			if (!IsPaused)
 			{
-				StarBackground.ManageAll();				GameWorld.ManageAll();				;
-				for(int i = Characters.Count - 1; i > -1; i--)
+				
+				for (int i = Characters.Count - 1; i > -1; i--)
 				{
-					Characters[i].Activity();
+					if (i < Characters.Count)
+					{
+						// We do the extra if-check because activity could destroy any number of entities
+						Characters[i].Activity();
+					}
 				}
 			}
 			else
 			{
 			}
-
-            if (IsPaused)
-            {
-                mAccumulatedPausedTime += TimeManager.SecondDifference;
-            }
-
 			base.Activity(firstTimeCalled);
+			if (!IsActivityFinished)
+			{
+				CustomActivity(firstTimeCalled);
+			}
+			StarBackground.ManageAll();
+			GameWorld.ManageAll();
 
-			CustomActivity(firstTimeCalled);
+
+				// After Custom Activity
+				
+            
 		}
 
 		public override void Destroy()
 		{
 			// Generated Destroy
-			StarBackground.RemoveFromManagers();
-
-			GameWorld.RemoveFromManagers();
-
-			WorldCollision.RemoveFromManagers();
-
-
-			while(Characters.Count != 0)
+			if (this.UnloadsContentManagerWhenDestroyed && ContentManagerName != "Global")
 			{
-				Characters[0].Destroy();
+				StarBackground.RemoveFromManagers(ContentManagerName != "Global");
+			}
+			else
+			{
+				StarBackground.RemoveFromManagers(false);
+			}
+			if (this.UnloadsContentManagerWhenDestroyed && ContentManagerName != "Global")
+			{
+				GameWorld.RemoveFromManagers(ContentManagerName != "Global");
+			}
+			else
+			{
+				GameWorld.RemoveFromManagers(false);
+			}
+			if (this.UnloadsContentManagerWhenDestroyed && ContentManagerName != "Global")
+			{
+				WorldCollision.RemoveFromManagers(ContentManagerName != "Global");
+			}
+			else
+			{
+				WorldCollision.RemoveFromManagers(false);
+			}
+			
+			for (int i = Characters.Count - 1; i > -1; i--)
+			{
+				Characters[i].Destroy();
 			}
 
 			base.Destroy();
 
 			CustomDestroy();
 
-            if (IsPaused)
-            {
-                UnpauseThisScreen();
-            }
 		}
-
-        void PauseThisScreen()
-        {
-            this.IsPaused = true;
-            InstructionManager.PauseEngine();
-
-        }
-
-        void UnpauseThisScreen()
-        {
-            InstructionManager.UnpauseEngine();
-            this.IsPaused = false;
-        }
-
-        public static double PauseAdjustedSecondsSince(double time)
-        {
-            return PauseAdjustedCurrentTime - time;
-        }
 
 		// Generated Methods
-		public virtual void PostInitialize()
+		public virtual void PostInitialize ()
 		{
+			bool oldShapeManagerSuppressAdd = FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue;
+			FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue = true;
+			FlatRedBall.Math.Geometry.ShapeManager.SuppressAddingOnVisibilityTrue = oldShapeManagerSuppressAdd;
 		}
-		public virtual void ConvertToManuallyUpdated()
+		public virtual void AddToManagersBottomUp ()
+		{
+			CameraSetup.ResetCamera(SpriteManager.Camera);
+			StarBackground.AddToManagers(mLayer);
+			GameWorld.AddToManagers(mLayer);
+			WorldCollision.AddToManagers(mLayer);
+		}
+		public virtual void ConvertToManuallyUpdated ()
 		{
 			StarBackground.ConvertToManuallyUpdated();
 			GameWorld.ConvertToManuallyUpdated();
-			for(int i = 0; i < Characters.Count; i++)
+			for (int i = 0; i < Characters.Count; i++)
 			{
 				Characters[i].ConvertToManuallyUpdated();
 			}
 		}
-		protected virtual void SetCustomVariables()
+		public static void LoadStaticContent (string contentManagerName)
 		{
-		}
-
-		public static void LoadStaticContent(string contentManagerName)
-		{
-			bool registerUnload = false;
-			const bool throwExceptionIfAfterInitialize = false;
-			if(throwExceptionIfAfterInitialize && registerUnload && ScreenManager.CurrentScreen != null && ScreenManager.CurrentScreen.ActivityCallCount > 0 && !ScreenManager.CurrentScreen.IsActivityFinished)
+			if (string.IsNullOrEmpty(contentManagerName))
 			{
-				throw new InvalidOperationException("Content is being loaded after the current Screen is initialized.  This exception is being thrown because of a setting in Glue.");
+				throw new ArgumentException("contentManagerName cannot be empty or null");
 			}
+			#if DEBUG
+			if (contentManagerName == FlatRedBallServices.GlobalContentManager)
+			{
+				HasBeenLoadedWithGlobalContentManager = true;
+			}
+			else if (HasBeenLoadedWithGlobalContentManager)
+			{
+				throw new Exception("This type has been loaded with a Global content manager, then loaded with a non-global.  This can lead to a lot of bugs");
+			}
+			#endif
 			CustomLoadStaticContent(contentManagerName);
+		}
+		[System.Obsolete("Use GetFile instead")]
+		public static object GetStaticMember (string memberName)
+		{
+			return null;
+		}
+		public static object GetFile (string memberName)
+		{
+			return null;
+		}
+		object GetMember (string memberName)
+		{
+			switch(memberName)
+			{
+				case  "StarBackground":
+					return StarBackground;
+				case  "GameWorld":
+					return GameWorld;
+				case  "WorldCollision":
+					return WorldCollision;
+			}
+			return null;
 		}
 
 

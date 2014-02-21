@@ -1,27 +1,41 @@
 using System.Collections.Generic;
+using System.Threading;
 using FlatRedBall;
 using FlatRedBall.Math.Geometry;
 using FlatRedBall.ManagedSpriteGroups;
 using FlatRedBall.Graphics.Animation;
 using FlatRedBall.Graphics.Particle;
 using FlatRedBall.AI.Pathfinding;
-using Texture2D = Microsoft.Xna.Framework.Graphics.Texture2D;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
+using FlatRedBall.Utilities;
 using BitmapFont = FlatRedBall.Graphics.BitmapFont;
+using FlatRedBall.Localization;
 
 namespace AITestBed
 {
-	public static class GlobalContent
+	public static partial class GlobalContent
 	{
 		
-		public static void Initialize()
+		[System.Obsolete("Use GetFile instead")]
+		public static object GetStaticMember (string memberName)
 		{
-			string ContentManagerName = "Global";
-
+			return null;
 		}
-
-
-
+		public static object GetFile (string memberName)
+		{
+			return null;
+		}
+		public static bool IsInitialized { get; private set; }
+		public static bool ShouldStopLoading { get; set; }
+		static string ContentManagerName = "Global";
+		public static void Initialize ()
+		{
+			
+						IsInitialized = true;
+		}
+		public static void Reload (object whatToReload)
+		{
+		}
+		
+		
 	}
 }

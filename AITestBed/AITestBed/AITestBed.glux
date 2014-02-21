@@ -2,238 +2,176 @@
 <GlueProjectSave xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Screens>
     <ScreenSave>
-      <States />
-      <Events />
-      <IsOnOwnLayer>false</IsOnOwnLayer>
-      <CustomVariables />
+      <Tags>
+        <string>GLUE</string>
+      </Tags>
+      <Source>GLUE</Source>
       <Name>Screens\MainScreen</Name>
       <ReferencedFiles>
         <ReferencedFileSave>
-          <ContainerType>Screen</ContainerType>
-          <Name>Content/Screens/MainScreen/StarBackground.scnx</Name>
-          <IsManuallyUpdated>false</IsManuallyUpdated>
+          <Name>Screens/MainScreen/StarBackground.scnx</Name>
           <IsSharedStatic>false</IsSharedStatic>
-          <IncludeDirectoryRelativeToContainer>false</IncludeDirectoryRelativeToContainer>
-          <LoadedOnlyWhenReferenced>false</LoadedOnlyWhenReferenced>
-          <ContentProjectParent>Content</ContentProjectParent>
-          <HasPublicProperty>false</HasPublicProperty>
-          <OpensWith>&lt;DEFAULT&gt;</OpensWith>
-          <LoadedAtRuntime>true</LoadedAtRuntime>
-          <CreatesDictionary>false</CreatesDictionary>
-          <CsvDelimiter>Comma</CsvDelimiter>
-          <TreatAsCsv>false</TreatAsCsv>
         </ReferencedFileSave>
         <ReferencedFileSave>
-          <ContainerType>Screen</ContainerType>
-          <Name>Content/Screens/MainScreen/GameWorld.scnx</Name>
-          <IsManuallyUpdated>false</IsManuallyUpdated>
+          <Name>Screens/MainScreen/GameWorld.scnx</Name>
           <IsSharedStatic>false</IsSharedStatic>
-          <IncludeDirectoryRelativeToContainer>false</IncludeDirectoryRelativeToContainer>
-          <LoadedOnlyWhenReferenced>false</LoadedOnlyWhenReferenced>
-          <ContentProjectParent>Content</ContentProjectParent>
-          <HasPublicProperty>false</HasPublicProperty>
-          <OpensWith>&lt;DEFAULT&gt;</OpensWith>
-          <LoadedAtRuntime>true</LoadedAtRuntime>
-          <CreatesDictionary>false</CreatesDictionary>
-          <CsvDelimiter>Comma</CsvDelimiter>
-          <TreatAsCsv>false</TreatAsCsv>
         </ReferencedFileSave>
         <ReferencedFileSave>
-          <ContainerType>Screen</ContainerType>
-          <Name>Content/Screens/MainScreen/WorldCollision.shcx</Name>
-          <IsManuallyUpdated>false</IsManuallyUpdated>
+          <Name>Screens/MainScreen/WorldCollision.shcx</Name>
           <IsSharedStatic>false</IsSharedStatic>
-          <IncludeDirectoryRelativeToContainer>false</IncludeDirectoryRelativeToContainer>
-          <LoadedOnlyWhenReferenced>false</LoadedOnlyWhenReferenced>
-          <ContentProjectParent>Content</ContentProjectParent>
-          <HasPublicProperty>false</HasPublicProperty>
-          <OpensWith>&lt;DEFAULT&gt;</OpensWith>
-          <LoadedAtRuntime>true</LoadedAtRuntime>
-          <CreatesDictionary>false</CreatesDictionary>
-          <CsvDelimiter>Comma</CsvDelimiter>
-          <TreatAsCsv>false</TreatAsCsv>
         </ReferencedFileSave>
       </ReferencedFiles>
       <NamedObjects>
         <NamedObjectSave>
-          <ContainerType>Screen</ContainerType>
           <SourceType>FlatRedBallType</SourceType>
           <SourceClassType>PositionedObjectList&lt;T&gt;</SourceClassType>
           <SourceClassGenericType>Entities\Character</SourceClassGenericType>
           <InstanceName>Characters</InstanceName>
-          <HasPublicProperty>false</HasPublicProperty>
-          <SetByDerived>false</SetByDerived>
-          <SetByContainer>false</SetByContainer>
           <AttachToContainer>false</AttachToContainer>
-          <AttachToCamera>false</AttachToCamera>
-          <AddToManagers>true</AddToManagers>
-          <IncludeInIVisible>true</IncludeInIVisible>
-          <IncludeInIClickable>true</IncludeInIClickable>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
-          <DefinedByBase>false</DefinedByBase>
-          <IsDisabled>false</IsDisabled>
-          <VariablesToReset />
-          <IgnoresPausing>false</IgnoresPausing>
-          <CallActivity>true</CallActivity>
-          <ContainedObjects />
-          <Is2D>false</Is2D>
-          <Events />
+          <IndependentOfCamera>true</IndependentOfCamera>
         </NamedObjectSave>
       </NamedObjects>
-      <Behaviors />
-      <UseGlobalContent>false</UseGlobalContent>
-      <IsRequiredAtStartup>false</IsRequiredAtStartup>
     </ScreenSave>
   </Screens>
   <Entities>
     <EntitySave>
-      <States />
+      <Tags>
+        <string>GLUE</string>
+      </Tags>
+      <Source>GLUE</Source>
       <CustomVariables>
         <CustomVariable>
+          <Properties>
+            <PropertySave>
+              <Name>Type</Name>
+              <ValueAsString>int</ValueAsString>
+            </PropertySave>
+          </Properties>
           <Name>MaxSpeed</Name>
           <Type>int</Type>
-          <CreatesEvent>false</CreatesEvent>
           <DefaultValue xsi:type="xsd:int">0</DefaultValue>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
           <SetByDerived>true</SetByDerived>
-          <IsShared>false</IsShared>
-          <DefinedByBase>false</DefinedByBase>
         </CustomVariable>
       </CustomVariables>
-      <IsUnique>false</IsUnique>
-      <ImplementsIClickable>false</ImplementsIClickable>
-      <ImplementsIVisible>false</ImplementsIVisible>
-      <ImplementsIWindow>false</ImplementsIWindow>
       <Name>Entities\Character</Name>
       <NamedObjects>
         <NamedObjectSave>
-          <CustomProperty>
-            <Type>Boolean</Type>
-            <Member>Visible</Member>
-            <Time>0</Time>
-          </CustomProperty>
-          <ContainerType>Entity</ContainerType>
           <SourceType>File</SourceType>
-          <SourceFile>Content/Entities/Character/EntityCollisionFile.shcx</SourceFile>
+          <SourceFile>Entities/Character/EntityCollisionFile.shcx</SourceFile>
           <SourceName>Circle1 (Circle)</SourceName>
           <InstanceName>Collision</InstanceName>
           <HasPublicProperty>true</HasPublicProperty>
-          <SetByDerived>false</SetByDerived>
-          <SetByContainer>false</SetByContainer>
           <AttachToContainer>true</AttachToContainer>
-          <AttachToCamera>false</AttachToCamera>
-          <AddToManagers>true</AddToManagers>
-          <IncludeInIVisible>true</IncludeInIVisible>
-          <IncludeInIClickable>true</IncludeInIClickable>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
-          <DefinedByBase>false</DefinedByBase>
-          <IsDisabled>false</IsDisabled>
-          <VariablesToReset />
-          <IgnoresPausing>false</IgnoresPausing>
-          <CallActivity>true</CallActivity>
-          <ContainedObjects />
-          <Is2D>false</Is2D>
-          <Events />
+          <IndependentOfCamera>true</IndependentOfCamera>
         </NamedObjectSave>
       </NamedObjects>
       <ReferencedFiles>
         <ReferencedFileSave>
-          <ContainerType>Entity</ContainerType>
-          <Name>Content/Entities/Character/EntityCollisionFile.shcx</Name>
-          <IsManuallyUpdated>false</IsManuallyUpdated>
+          <Name>Entities/Character/EntityCollisionFile.shcx</Name>
           <IsSharedStatic>true</IsSharedStatic>
-          <IncludeDirectoryRelativeToContainer>false</IncludeDirectoryRelativeToContainer>
-          <LoadedOnlyWhenReferenced>false</LoadedOnlyWhenReferenced>
-          <ContentProjectParent>Content</ContentProjectParent>
-          <HasPublicProperty>false</HasPublicProperty>
-          <OpensWith>&lt;DEFAULT&gt;</OpensWith>
-          <LoadedAtRuntime>true</LoadedAtRuntime>
-          <CreatesDictionary>false</CreatesDictionary>
-          <CsvDelimiter>Comma</CsvDelimiter>
-          <TreatAsCsv>false</TreatAsCsv>
         </ReferencedFileSave>
       </ReferencedFiles>
-      <Behaviors />
-      <CreatedByOtherEntities>false</CreatedByOtherEntities>
       <PooledByFactory>true</PooledByFactory>
-      <UseGlobalContent>false</UseGlobalContent>
+      <Is2D>false</Is2D>
     </EntitySave>
     <EntitySave>
-      <States />
+      <Tags>
+        <string>GLUE</string>
+      </Tags>
+      <Source>GLUE</Source>
       <CustomVariables>
         <CustomVariable>
+          <Properties>
+            <PropertySave>
+              <Name>Type</Name>
+              <ValueAsString>float</ValueAsString>
+            </PropertySave>
+          </Properties>
           <Name>X</Name>
           <Type>float</Type>
-          <CreatesEvent>false</CreatesEvent>
           <DefaultValue xsi:type="xsd:float">0</DefaultValue>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
-          <SetByDerived>false</SetByDerived>
-          <IsShared>false</IsShared>
-          <DefinedByBase>false</DefinedByBase>
         </CustomVariable>
         <CustomVariable>
+          <Properties>
+            <PropertySave>
+              <Name>Type</Name>
+              <ValueAsString>int</ValueAsString>
+            </PropertySave>
+          </Properties>
           <Name>MaxSpeed</Name>
           <Type>int</Type>
-          <CreatesEvent>false</CreatesEvent>
           <DefaultValue xsi:type="xsd:int">12</DefaultValue>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
-          <SetByDerived>false</SetByDerived>
-          <IsShared>false</IsShared>
           <DefinedByBase>true</DefinedByBase>
         </CustomVariable>
       </CustomVariables>
-      <IsUnique>false</IsUnique>
       <BaseEntity>Entities\Character</BaseEntity>
-      <ImplementsIClickable>false</ImplementsIClickable>
-      <ImplementsIVisible>false</ImplementsIVisible>
-      <ImplementsIWindow>false</ImplementsIWindow>
       <Name>Entities\Chaser</Name>
-      <NamedObjects />
-      <ReferencedFiles />
-      <Behaviors />
-      <CreatedByOtherEntities>false</CreatedByOtherEntities>
       <PooledByFactory>true</PooledByFactory>
-      <UseGlobalContent>false</UseGlobalContent>
+      <Is2D>false</Is2D>
     </EntitySave>
     <EntitySave>
-      <States />
+      <Tags>
+        <string>GLUE</string>
+      </Tags>
+      <Source>GLUE</Source>
       <CustomVariables>
         <CustomVariable>
+          <Properties>
+            <PropertySave>
+              <Name>Type</Name>
+              <ValueAsString>int</ValueAsString>
+            </PropertySave>
+          </Properties>
           <Name>MaxSpeed</Name>
           <Type>int</Type>
-          <CreatesEvent>false</CreatesEvent>
           <DefaultValue xsi:type="xsd:int">10</DefaultValue>
-          <FulfillsRequirement>&lt;NONE&gt;</FulfillsRequirement>
-          <SetByDerived>false</SetByDerived>
-          <IsShared>false</IsShared>
           <DefinedByBase>true</DefinedByBase>
         </CustomVariable>
       </CustomVariables>
-      <IsUnique>false</IsUnique>
       <BaseEntity>Entities\Character</BaseEntity>
-      <ImplementsIClickable>false</ImplementsIClickable>
-      <ImplementsIVisible>false</ImplementsIVisible>
-      <ImplementsIWindow>false</ImplementsIWindow>
       <Name>Entities\Runner</Name>
-      <NamedObjects />
-      <ReferencedFiles />
-      <Behaviors />
-      <CreatedByOtherEntities>false</CreatedByOtherEntities>
       <PooledByFactory>true</PooledByFactory>
-      <UseGlobalContent>false</UseGlobalContent>
+      <Is2D>false</Is2D>
     </EntitySave>
   </Entities>
   <GlobalFiles />
+  <GlobalContentSettingsSave>
+    <LoadAsynchronously>false</LoadAsynchronously>
+    <RecordLockContention>false</RecordLockContention>
+  </GlobalContentSettingsSave>
   <SyncedProjects />
   <StartUpScreen>Screens\MainScreen</StartUpScreen>
-  <In2D>false</In2D>
-  <SetResolution>false</SetResolution>
+  <In2D>true</In2D>
+  <SetResolution>true</SetResolution>
   <ResolutionWidth>800</ResolutionWidth>
   <ResolutionHeight>600</ResolutionHeight>
+  <SetOrthogonalResolution>true</SetOrthogonalResolution>
+  <OrthogonalWidth>200</OrthogonalWidth>
+  <OrthogonalHeight>150</OrthogonalHeight>
+  <ResolutionPresets />
   <PerformanceSettingsSave>
     <ThrowExceptionOnPostInitializeContentLoad>false</ThrowExceptionOnPostInitializeContentLoad>
+    <RecordInitializeSegments>false</RecordInitializeSegments>
   </PerformanceSettingsSave>
   <IgnoredDirectories />
-  <CustomClasses />
+  <CustomClasses>
+    <CustomClassSave>
+      <CsvFilesUsingThis />
+      <RequiredProperties>
+        <InstructionSave>
+          <Type>bool</Type>
+          <Member>HasCollision</Member>
+          <ValueAsBool>false</ValueAsBool>
+        </InstructionSave>
+        <InstructionSave>
+          <Type>string</Type>
+          <Member>Name</Member>
+        </InstructionSave>
+      </RequiredProperties>
+      <Name>TileMapInfo</Name>
+    </CustomClassSave>
+  </CustomClasses>
   <TranslatedFiles />
+  <ApplyToFixedResolutionPlatforms>true</ApplyToFixedResolutionPlatforms>
+  <ExternallyBuiltFileDirectory>../../</ExternallyBuiltFileDirectory>
 </GlueProjectSave>
