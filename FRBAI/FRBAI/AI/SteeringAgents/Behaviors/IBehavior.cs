@@ -23,10 +23,16 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         float Probability { get; set; }
 
         /// <summary>
+        /// Give user ability to pick a certain behavior from Behavior List
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
         /// Calculates force to apply.
         /// </summary>
         /// <param name="pAgent">Source Agent</param>
         /// <returns>Force to apply to source agent.</returns>
         Vector3 Calculate(PositionedObject pAgent);
+
     }
 }

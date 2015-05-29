@@ -23,17 +23,21 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Probability = 1;
             MaxSpeed = 1;
             Deceleration = .6f;
+            Name = "FollowPath";
+            StopDistance = 1f;
         }
 
         public float WayPointArrivedDistance { get; set; }
         public bool Loop { get; set; }
         public int MaxSpeed { get; set; }
         public float Deceleration { get; set; }
+        public float StopDistance { get; set; } 
 
         #region IBehavior Members
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
@@ -62,11 +66,13 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
                 if (!mFinished)
                 {
-                    return SteeringHelper.Seek(pAgent, mPath[mCurrentWayPoint], MaxSpeed);
-                }else{
+                    return SteeringHelper.Seek(pAgent, mPath[mCurrentWayPoint], MaxSpeed, StopDistance);
+                }
+                else
+                {
                     if(mCurrentWayPoint < mPath.Count)
                     {
-                        return SteeringHelper.Arrive(pAgent, mPath[mCurrentWayPoint], Deceleration);
+                        return SteeringHelper.Arrive(pAgent, mPath[mCurrentWayPoint], Deceleration, StopDistance);
                     }
                 }
             }

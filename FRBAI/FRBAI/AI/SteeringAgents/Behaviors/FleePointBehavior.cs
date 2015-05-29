@@ -17,6 +17,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             PanicDistance = 10;
             Weight = 1;
             Probability = 1;
+            Name = "FleePoint";
         }
 
         public float PanicDistance { get; set; }
@@ -33,6 +34,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
