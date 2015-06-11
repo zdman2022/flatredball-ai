@@ -20,20 +20,27 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             CohesionWeight = .5f;
             Weight = 1;
             Probability = 1;
+            Name = "Flock";
+            StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public List<PositionedObject> FlockingAgents { get; set; }
         public float FlockingRadius { get; set; }
         public int MaxSpeed { get; set; }
+        public float StopDistance { get; set; } //distance to stop at the seek destination
 
         public float SeperationWeight { get; set; }
         public float AlignmentWeight { get; set; }
         public float CohesionWeight { get; set; }
+      
 
         #region IBehavior Members
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
@@ -45,7 +52,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
                 SteeringForce += SteeringHelper.Seperation(pAgent, Neighbors) * SeperationWeight;
                 SteeringForce += SteeringHelper.Alignment(pAgent, Neighbors) * AlignmentWeight;
-                SteeringForce += SteeringHelper.Cohesion(pAgent, Neighbors, MaxSpeed) * CohesionWeight;
+                SteeringForce += SteeringHelper.Cohesion(pAgent, Neighbors, MaxSpeed, StopDistance) * CohesionWeight;
             }
 
             return SteeringForce;

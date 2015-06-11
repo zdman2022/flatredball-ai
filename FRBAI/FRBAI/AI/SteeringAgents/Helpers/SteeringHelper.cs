@@ -6,6 +6,7 @@ using FlatRedBall;
 using Microsoft.Xna.Framework;
 using FlatRedBall.Math.Geometry;
 using FlatRedBall.AI.Pathfinding;
+using FlatRedBall.Math;
 
 namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 {
@@ -198,9 +199,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pObjects">Circles to check if close enough.</param>
         /// <param name="pDistance">Distance to check.</param>
         /// <returns>List of circles that are within the specified distance.</returns>
-        internal static List<Circle> GetCloseObjects(Vector3 pOrigin, List<Circle> pObjects, float pDistance)
+        internal static PositionedObjectList<Circle> GetCloseObjects(Vector3 pOrigin, PositionedObjectList<Circle> pObjects, float pDistance)
         {
-            List<Circle> results = new List<Circle>();
+            PositionedObjectList<Circle> results = new PositionedObjectList<Circle>();
 
             foreach (Circle var in pObjects)
             {
@@ -258,17 +259,29 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pAgent">Source Agent</param>
         /// <param name="pTargetPos">Where to travel to.</param>
         /// <param name="pMaxSpeed">Maximum Speed of source agent.</param>
+        /// <param name="pStopDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Seek(PositionedObject pAgent, Vector3 pTargetPos, int pMaxSpeed)
+        public static Vector3 Seek(PositionedObject pAgent, Vector3 pTargetPos, int pMaxSpeed, float pStopDistance)
         {
             Vector3 DesiredVelocity;
+            Vector3 Result;
 
-            if (pTargetPos != pAgent.Position)
+            float distance = Vector3.Distance(pTargetPos, pAgent.Position);
+
+            if (distance > pStopDistance)
+            {
                 DesiredVelocity = Vector3.Normalize(pTargetPos - pAgent.Position) * pMaxSpeed;
+            }
             else
+            {
+                //stop entity velocity after entity has reached target destination
                 DesiredVelocity = Vector3.Zero;
+                pAgent.Velocity = Vector3.Zero;
+            }
 
-            return (DesiredVelocity - pAgent.Velocity);
+
+            Result = (DesiredVelocity - pAgent.Velocity);
+            return Result;
         }
 
         /// <summary>
@@ -297,14 +310,15 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pAgent">Source Agent</param>
         /// <param name="pTargetPos">Where to travel to.</param>
         /// <param name="pDeceleration">How fast to decelerate.  Lower the number, the faster the deceleration
+        /// <param name="pStopDistance">Distance to stop at the destination</param>
         /// Suggested: Fast = 0.3, Normal = 0.6, Slow = 0.9</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Arrive(PositionedObject pAgent, Vector3 pTargetPos, float pDeceleration)
+        public static Vector3 Arrive(PositionedObject pAgent, Vector3 pTargetPos, float pDeceleration, float pStopDistance)
         {
             //Get the distance
             float dist = Vector3.Distance(pTargetPos, pAgent.Position);
 
-            if (dist > 0)
+            if (dist > pStopDistance)
             {
                 //Calculate speed to reach using deceleration
                 float speed = dist / pDeceleration;
@@ -314,8 +328,12 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 
                 return (DesiredVelocity - pAgent.Velocity);
             }
+            else
+            {
+                pAgent.Velocity = Vector3.Zero;
+                return Vector3.Zero;
+            }
 
-            return Vector3.Zero;
         }
 
         /// <summary>
@@ -325,7 +343,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pTarget">Moving object to pursue.</param>
         /// <param name="pMaxSpeed">Maximum Speed of source agent.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Pursuit(PositionedObject pAgent, PositionedObject pTarget, int pMaxSpeed)
+        public static Vector3 Pursuit(PositionedObject pAgent, PositionedObject pTarget, int pMaxSpeed, float pStopDistance)
         {
             //If just ahead, then just seek
             Vector3 ToTarget = pTarget.Position - pAgent.Position;
@@ -334,7 +352,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 
             if (Vector3.Dot(ToTarget, pAgent.Velocity) > 0 && RelativeHeading < -0.95)  //acos(0.95) = 18 degs
             {
-                return Seek(pAgent, pTarget.Position, pMaxSpeed);
+                return Seek(pAgent, pTarget.Position, pMaxSpeed, pStopDistance);
             }
 
 
@@ -346,7 +364,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             float LookAheadTime = ToTarget.Length() / (pMaxSpeed + pTarget.Velocity.Length());
 
             //Now seek to the predicted future position of the evader
-            return Seek(pAgent, pTarget.Position + pTarget.Velocity * LookAheadTime, pMaxSpeed);
+            return Seek(pAgent, pTarget.Position + pTarget.Velocity * LookAheadTime, pMaxSpeed, pStopDistance);
         }
 
         /// <summary>
@@ -408,13 +426,13 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pMinDetectionBoxLength">Minimum length to check ahead.</param>
         /// <param name="pBreakWeight">How hard to stop when approaching an obstacle.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 AvoidObstacles(PositionedObject pAgent, float pAgentRadius, List<Circle> pObstacles, int pMaxSpeed, float pMinDetectionBoxLength, float pBreakWeight)
+        public static Vector3 AvoidObstacles(PositionedObject pAgent, float pAgentRadius, PositionedObjectList<Circle> pObstacles, int pMaxSpeed, float pMinDetectionBoxLength, float pBreakWeight)
         {
-            if(pAgent.Velocity.Length() > 0)
+            if (pAgent.Velocity.Length() > 0)
             {
                 float boxLength = pMinDetectionBoxLength + (pAgent.Velocity.Length() / pMaxSpeed) * pMinDetectionBoxLength;
 
-                List<Circle> closeObjects = GetCloseObjects(pAgent.Position, pObstacles, boxLength);
+                PositionedObjectList<Circle> closeObjects = GetCloseObjects(pAgent.Position, pObstacles, boxLength);
 
                 Circle closestObject = null;
                 double closestObjectDistance = double.MaxValue;
@@ -442,7 +460,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                     }
                 }
 
-                if(closestObject != null)
+                if (closestObject != null)
                 {
                     Vector3 steeringForce = new Vector3();
 
@@ -470,7 +488,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pBarriers">Objects to avoid</param>
         /// <param name="pFeelerLength">How far ahead to search.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 BarrierAvoidanceWithThreeFeelers(PositionedObject pAgent, List<AxisAlignedRectangle> pBarriers, float pFeelerLength)
+        public static Vector3 BarrierAvoidanceWithThreeFeelers(PositionedObject pAgent, PositionedObjectList<AxisAlignedRectangle> pBarriers, float pFeelerLength)
         {
             List<Vector3> feelers = new List<Vector3>();
 
@@ -502,9 +520,10 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                 {
                     if (feelerIntersectLine.CollideAgainst(var))
                     {
-                        Segment segIntersect = new Segment(new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint1.X, feelerIntersectLine.AbsolutePoint1.Y), new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint2.X, feelerIntersectLine.AbsolutePoint2.Y));
+                        Segment segIntersect = new Segment(new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint1.X, feelerIntersectLine.AbsolutePoint1.Y),
+                            new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint2.X, feelerIntersectLine.AbsolutePoint2.Y));
                         FlatRedBall.Math.Geometry.Point intersectPoint;
-                        
+
                         List<Segment> sides = new List<Segment>();
 
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Left, var.Top), new FlatRedBall.Math.Geometry.Point(var.Right, var.Top))); //Top
@@ -512,9 +531,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Left, var.Bottom), new FlatRedBall.Math.Geometry.Point(var.Right, var.Bottom)));    //Bottom
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Right, var.Bottom), new FlatRedBall.Math.Geometry.Point(var.Right, var.Top)));   //Right
 
-                        foreach(Segment side in sides)
+                        foreach (Segment side in sides)
                         {
-                            if(segIntersect.Intersects(side, out intersectPoint))
+                            if (segIntersect.Intersects(side, out intersectPoint))
                             {
                                 barrierDist = (float)FlatRedBall.Math.Geometry.Point.DistanceTo(origin, intersectPoint);
                                 if (closestDistanceToBarrier > barrierDist)
@@ -556,6 +575,112 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             return SteeringForce;
         }
 
+
+        /// <summary>
+        /// Avoids polygon objects
+        /// </summary>
+        /// <param name="pAgent">Source Agent</param>
+        /// <param name="pBarriers">Objects to avoid</param>
+        /// <param name="pFeelerLength">How far ahead to search.</param>
+        /// <returns>Vector3 with the direction and speed to move.</returns>
+        public static Vector3 BarrierAvoidanceWithThreeFeelersPolygon(PositionedObject pAgent, PositionedObjectList<Polygon> pBarriers, float pFeelerLength)
+        {
+            List<Vector3> feelers = new List<Vector3>();
+
+            feelers.Add(pAgent.Velocity);
+            feelers.Add(RotateVectorOnZPlane(pAgent.Velocity, (float)(Math.PI / 4)));
+            feelers.Add(RotateVectorOnZPlane(pAgent.Velocity, (float)(-Math.PI / 4)));
+
+            FlatRedBall.Math.Geometry.Point origin = new FlatRedBall.Math.Geometry.Point(pAgent.Position.X, pAgent.Position.Y);
+
+            Line feelerIntersectLine = new Line();
+
+            Vector3 SteeringForce = Vector3.Zero;
+
+            foreach (Vector3 varFeeler in feelers)
+            {
+                float barrierDist = 0f;
+
+                float closestDistanceToBarrier = float.MaxValue;
+                Polygon closestBarrier = null;
+                FlatRedBall.Math.Geometry.Point closestIntersectionPoint = new FlatRedBall.Math.Geometry.Point();
+                Segment closestLine = new Segment();
+
+                feelerIntersectLine.Position = pAgent.Position;
+                feelerIntersectLine.RelativePoint1 = new Point3D();
+                varFeeler.Normalize();
+                feelerIntersectLine.RelativePoint2 = new Point3D(varFeeler * pFeelerLength);
+
+                foreach (Polygon var in pBarriers)
+                {
+                    if (feelerIntersectLine.CollideAgainst(var))
+                    {
+                        Segment segIntersect = new Segment(new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint1.X, feelerIntersectLine.AbsolutePoint1.Y),
+                            new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint2.X, feelerIntersectLine.AbsolutePoint2.Y));
+                        FlatRedBall.Math.Geometry.Point intersectPoint;
+
+                        List<Segment> sides = new List<Segment>();
+
+                        for (int i = 0; i < var.Points.Count; i++)
+                        {
+                            if (i < var.Points.Count - 1)
+                            {
+                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X + var.RelativeX, var.Points[i].Y + var.Y + var.RelativeY),
+                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[i + 1].X + var.X + var.RelativeX, var.Points[i + 1].Y + var.Y + var.RelativeY)));
+                            }
+                            else
+                            {
+                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X + var.RelativeX, var.Points[i].Y + var.Y + var.RelativeY),
+                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[0].X + var.X + var.RelativeX, var.Points[0].Y + var.Y + var.RelativeY)));
+                            }
+                        }
+
+                        foreach (Segment side in sides)
+                        {
+                            if (segIntersect.Intersects(side, out intersectPoint))
+                            {
+                                barrierDist = (float)FlatRedBall.Math.Geometry.Point.DistanceTo(origin, intersectPoint);
+                                if (closestDistanceToBarrier > barrierDist)
+                                {
+                                    closestDistanceToBarrier = barrierDist;
+                                    closestBarrier = var;
+                                    closestIntersectionPoint = intersectPoint;
+                                    closestLine = side;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //Calculate force if feeler found barrier
+                if (closestBarrier != null)
+                {
+                    Vector3 EndPoint = new Vector3((float)feelerIntersectLine.AbsolutePoint2.X, (float)feelerIntersectLine.AbsolutePoint2.Y, 0);
+                    Vector3 IntersectionPoint = closestIntersectionPoint.ToVector3();
+
+                    Vector3 OverShoot = EndPoint - IntersectionPoint;
+                    Vector3 LineDirection = closestLine.ToVector3();
+                    Vector3 OverShootDirection = OverShoot;
+                    OverShootDirection.Normalize();
+                    LineDirection.Normalize();
+
+                    if (Math.Abs(AngleBetween2Vectors(LineDirection, OverShootDirection)) > (Math.PI / 2))
+                    {
+                        LineDirection *= -1f;
+                    }
+
+                    Vector3 Normal = (LineDirection - OverShootDirection);
+                    Normal.Normalize();
+
+                    SteeringForce += Vector3.Multiply(Normal, OverShoot.Length());
+                }
+
+            }
+
+            return SteeringForce;
+        }
+
+
         /// <summary>
         /// Moves inbetween 2 objects
         /// </summary>
@@ -564,8 +689,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pTarget2">Second target</param>
         /// <param name="pMaxSpeed">Maximum Speed of Source Agent</param>
         /// <param name="pDeceleration">How fast to get there.  See arrive.</param>
+        /// <param name="pStopDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Interpose(PositionedObject pAgent, PositionedObject pTarget1, PositionedObject pTarget2, int pMaxSpeed, float pDeceleration)
+        public static Vector3 Interpose(PositionedObject pAgent, PositionedObject pTarget1, PositionedObject pTarget2, int pMaxSpeed, float pDeceleration, float pStopDistance)
         {
             Vector3 MidPoint = (pTarget1.Position + pTarget2.Position) / 2f;
 
@@ -576,7 +702,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
 
             MidPoint = (Target1NewPos + Target2NewPos) / 2f;
 
-            return Arrive(pAgent, MidPoint, pDeceleration);
+            return Arrive(pAgent, MidPoint, pDeceleration, pStopDistance);
         }
 
         /// <summary>
@@ -589,13 +715,14 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pPanicDistance">When evading, this distance determines when to run.  See evade.</param>
         /// <param name="pMaxSpeed">Max speed source agent can travel.</param>
         /// <param name="pDeceleration">How fast to reach hiding spot.  See Arrive.</param>
+        /// <param name="pStopDistance">Distance to stop at the destination</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Hide(PositionedObject pAgent, PositionedObject pTarget, List<Circle> pObstacles, float pHideDistanceFromObstacle, float pDeceleration)
+        public static Vector3 Hide(PositionedObject pAgent, PositionedObject pTarget, PositionedObjectList<Circle> pObstacles, float pHideDistanceFromObstacle, float pDeceleration, float pStopDistance)
         {
             float Closest = float.MaxValue;
             Vector3 BestHidingSpot = Vector3.Zero;
 
-            foreach(Circle obs in pObstacles)
+            foreach (Circle obs in pObstacles)
             {
                 Vector3 HidingSpot = GetHidingPosition(pTarget.Position, obs, pHideDistanceFromObstacle);
 
@@ -614,7 +741,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                 return Vector3.Zero;
             }
 
-            return Arrive(pAgent, BestHidingSpot, pDeceleration);
+            return Arrive(pAgent, BestHidingSpot, pDeceleration, pStopDistance);
         }
 
         /// <summary>
@@ -672,7 +799,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <param name="pNeighbors">Nearby agents.</param>
         /// <param name="MaxSpeed">Maximum speed source agent can travel.</param>
         /// <returns>Vector3 with the direction and speed to move.</returns>
-        public static Vector3 Cohesion(PositionedObject pAgent, List<PositionedObject> pNeighbors, int MaxSpeed)
+        public static Vector3 Cohesion(PositionedObject pAgent, List<PositionedObject> pNeighbors, int MaxSpeed, float pStopDistance)
         {
             Vector3 CenterOfMass = Vector3.Zero;
             Vector3 SteeringForce = Vector3.Zero;
@@ -686,7 +813,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             {
                 CenterOfMass /= pNeighbors.Count;
 
-                SteeringForce = Seek(pAgent, CenterOfMass, MaxSpeed);
+                SteeringForce = Seek(pAgent, CenterOfMass, MaxSpeed, pStopDistance);
             }
 
             return SteeringForce;

@@ -16,6 +16,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             MaxSpeed = 1;
             Weight = 1;
             Probability = 1;
+            Name = "Chase";
+            StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public int MaxSpeed { get; set; }
@@ -25,6 +28,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
+        public float StopDistance { get; set; } //distance to stop at the seek destination
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
@@ -33,7 +39,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
                 PositionedObject target = SteeringHelper.GetClosestTarget(pAgent.Position, Targets);
 
                 if(target != null)
-                    return SteeringHelper.Pursuit(pAgent, target, MaxSpeed);
+                    return SteeringHelper.Pursuit(pAgent, target, MaxSpeed, StopDistance);
             }
 
             return Vector3.Zero;

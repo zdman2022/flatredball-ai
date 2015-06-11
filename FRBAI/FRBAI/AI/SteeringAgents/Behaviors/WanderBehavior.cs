@@ -20,6 +20,8 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             WanderJitter = .2f;
             Weight = 1;
             Probability = 1;
+            Name = "Wander";
+            TargetPosition = new Vector3();
         }
 
         public float WanderRadius { get; set;}
@@ -30,6 +32,8 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {

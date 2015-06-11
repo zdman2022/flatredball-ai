@@ -18,18 +18,24 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Deceleration = .3f;
             Weight = 1;
             Probability = 1;
+            Name = "GoToPoint";
+            StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public float Deceleration { get; set; }
+        public float StopDistance { get; set; } 
 
         #region IBehavior Members
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
-            return SteeringHelper.Arrive(pAgent, mTargetPos, Deceleration);
+            return SteeringHelper.Arrive(pAgent, mTargetPos, Deceleration, StopDistance);
         }
 
         #endregion

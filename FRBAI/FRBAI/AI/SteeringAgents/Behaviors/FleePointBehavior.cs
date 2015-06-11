@@ -17,22 +17,24 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             PanicDistance = 10;
             Weight = 1;
             Probability = 1;
+            Name = "FleePoint";
         }
 
         public float PanicDistance { get; set; }
         public int MaxSpeed { get; set; }
-
         private Vector3 mTargetPos;
-        public Vector3 TargetPosition
-        {
-            get { return mTargetPos; }
-            set { mTargetPos = value; }
-        }
 
         #region IBehavior Members
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
+        public string Name { get; set; }
+        public Vector3 TargetPosition
+        {
+            get { return mTargetPos; }
+            set { mTargetPos = value; }
+        }
+   
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
