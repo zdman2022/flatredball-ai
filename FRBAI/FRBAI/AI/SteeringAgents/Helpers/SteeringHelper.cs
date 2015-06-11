@@ -278,8 +278,8 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                 DesiredVelocity = Vector3.Zero;
                 pAgent.Velocity = Vector3.Zero;
             }
-           
-            
+
+
             Result = (DesiredVelocity - pAgent.Velocity);
             return Result;
         }
@@ -428,7 +428,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
         /// <returns>Vector3 with the direction and speed to move.</returns>
         public static Vector3 AvoidObstacles(PositionedObject pAgent, float pAgentRadius, PositionedObjectList<Circle> pObstacles, int pMaxSpeed, float pMinDetectionBoxLength, float pBreakWeight)
         {
-            if(pAgent.Velocity.Length() > 0)
+            if (pAgent.Velocity.Length() > 0)
             {
                 float boxLength = pMinDetectionBoxLength + (pAgent.Velocity.Length() / pMaxSpeed) * pMinDetectionBoxLength;
 
@@ -460,7 +460,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                     }
                 }
 
-                if(closestObject != null)
+                if (closestObject != null)
                 {
                     Vector3 steeringForce = new Vector3();
 
@@ -520,10 +520,10 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                 {
                     if (feelerIntersectLine.CollideAgainst(var))
                     {
-                        Segment segIntersect = new Segment(new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint1.X, feelerIntersectLine.AbsolutePoint1.Y), 
+                        Segment segIntersect = new Segment(new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint1.X, feelerIntersectLine.AbsolutePoint1.Y),
                             new FlatRedBall.Math.Geometry.Point(feelerIntersectLine.AbsolutePoint2.X, feelerIntersectLine.AbsolutePoint2.Y));
                         FlatRedBall.Math.Geometry.Point intersectPoint;
-                        
+
                         List<Segment> sides = new List<Segment>();
 
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Left, var.Top), new FlatRedBall.Math.Geometry.Point(var.Right, var.Top))); //Top
@@ -531,9 +531,9 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Left, var.Bottom), new FlatRedBall.Math.Geometry.Point(var.Right, var.Bottom)));    //Bottom
                         sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Right, var.Bottom), new FlatRedBall.Math.Geometry.Point(var.Right, var.Top)));   //Right
 
-                        foreach(Segment side in sides)
+                        foreach (Segment side in sides)
                         {
-                            if(segIntersect.Intersects(side, out intersectPoint))
+                            if (segIntersect.Intersects(side, out intersectPoint))
                             {
                                 barrierDist = (float)FlatRedBall.Math.Geometry.Point.DistanceTo(origin, intersectPoint);
                                 if (closestDistanceToBarrier > barrierDist)
@@ -625,13 +625,13 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
                         {
                             if (i < var.Points.Count - 1)
                             {
-                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X, var.Points[i].Y + var.Y),
-                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[i + 1].X + var.X, var.Points[i + 1].Y + var.Y)));
+                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X + var.RelativeX, var.Points[i].Y + var.Y + var.RelativeY),
+                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[i + 1].X + var.X + var.RelativeX, var.Points[i + 1].Y + var.Y + var.RelativeY)));
                             }
                             else
                             {
-                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X, var.Points[i].Y + var.Y),
-                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[0].X + var.X, var.Points[0].Y + var.Y)));
+                                sides.Add(new Segment(new FlatRedBall.Math.Geometry.Point(var.Points[i].X + var.X + var.RelativeX, var.Points[i].Y + var.Y + var.RelativeY),
+                                                                     new FlatRedBall.Math.Geometry.Point(var.Points[0].X + var.X + var.RelativeX, var.Points[0].Y + var.Y + var.RelativeY)));
                             }
                         }
 
@@ -722,7 +722,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Helpers
             float Closest = float.MaxValue;
             Vector3 BestHidingSpot = Vector3.Zero;
 
-            foreach(Circle obs in pObstacles)
+            foreach (Circle obs in pObstacles)
             {
                 Vector3 HidingSpot = GetHidingPosition(pTarget.Position, obs, pHideDistanceFromObstacle);
 

@@ -28,6 +28,11 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         string Name { get; set; }
 
         /// <summary>
+        /// Target position that entity is seeking/targeting
+        /// </summary>
+        Vector3 TargetPosition { get; set; }
+
+        /// <summary>
         /// Calculates force to apply.
         /// </summary>
         /// <param name="pAgent">Source Agent</param>

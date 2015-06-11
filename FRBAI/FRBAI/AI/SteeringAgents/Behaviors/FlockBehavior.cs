@@ -22,22 +22,25 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Probability = 1;
             Name = "Flock";
             StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public List<PositionedObject> FlockingAgents { get; set; }
         public float FlockingRadius { get; set; }
         public int MaxSpeed { get; set; }
+        public float StopDistance { get; set; } //distance to stop at the seek destination
 
         public float SeperationWeight { get; set; }
         public float AlignmentWeight { get; set; }
         public float CohesionWeight { get; set; }
+      
 
         #region IBehavior Members
 
         public float Weight{ get; set; }
         public float Probability { get; set; }
         public string Name { get; set; }
-        public float StopDistance { get; set; } //distance to stop at the seek destination
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {

@@ -18,10 +18,10 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Probability = 1;
             Name = "SeekPoint";
             StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public int MaxSpeed { get; set; }
-        public Vector3 TargetPosition { get; set; }
         public float StopDistance { get; set; } 
 
         #region IBehavior Members
@@ -29,6 +29,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         public float Weight{ get; set; }
         public float Probability { get; set; }
         public string Name { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {

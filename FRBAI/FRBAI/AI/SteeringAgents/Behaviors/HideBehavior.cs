@@ -22,6 +22,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Probability = 1;
             Name = "Hide";
             StopDistance = 1;
+            TargetPosition = new Vector3();
         }
 
         public PositionedObject HideFromTarget { get; set; }
@@ -36,6 +37,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         public float Weight{ get; set; }
         public float Probability { get; set; }
         public string Name { get; set; }
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {

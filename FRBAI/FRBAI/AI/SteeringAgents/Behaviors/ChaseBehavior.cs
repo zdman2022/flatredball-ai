@@ -18,6 +18,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
             Probability = 1;
             Name = "Chase";
             StopDistance = 1f;
+            TargetPosition = new Vector3();
         }
 
         public int MaxSpeed { get; set; }
@@ -29,6 +30,7 @@ namespace FlatRedBallAI.AI.SteeringAgents.Behaviors
         public float Probability { get; set; }
         public string Name { get; set; }
         public float StopDistance { get; set; } //distance to stop at the seek destination
+        public Vector3 TargetPosition { get; set; }
 
         Vector3 IBehavior.Calculate(PositionedObject pAgent)
         {
